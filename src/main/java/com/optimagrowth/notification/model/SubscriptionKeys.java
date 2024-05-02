@@ -1,3 +1,4 @@
+
 package com.optimagrowth.notification.model;
 
 import jakarta.persistence.Column;
@@ -9,7 +10,7 @@ import lombok.ToString;
 @Data
 @ToString
 @Embeddable
-public class NotificationKeys {
+public class SubscriptionKeys {
 
     @Column(name = "p256dh", nullable = false)
     @NotBlank

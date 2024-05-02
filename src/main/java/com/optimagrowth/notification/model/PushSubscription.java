@@ -12,8 +12,8 @@ import lombok.ToString;
 @Data
 @ToString
 @Entity
-@Table(name = "notification_subscriptions")
-public class NotificationSubscription {
+@Table(name = "push_subscription")
+public class PushSubscription  {
     @Id
     @Column(name = "id", nullable = false)
     private String id;
@@ -26,6 +26,6 @@ public class NotificationSubscription {
 
     @NotNull
     @Embedded
-    private NotificationKeys keys;
+    private SubscriptionKeys keys;
 
 }

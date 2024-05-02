@@ -19,7 +19,7 @@
 		<spring-cloud.version>2023.0.1</spring-cloud.version>
 		<cross-cutting-concerns.version>0.0.1-SNAPSHOT</cross-cutting-concerns.version>
 		<jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version>
-		<nl.martijndwars.version>3.0.2</nl.martijndwars.version>
+		<web-push.version>3.0.2</web-push.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -89,7 +89,7 @@
 		<dependency>
 		    <groupId>nl.martijndwars</groupId>
 		    <artifactId>web-push</artifactId>
-		    <version>${nl.martijndwars.version}</version>
+		    <version>${web-push.version}</version>
 		</dependency>
 		
 		<dependency>

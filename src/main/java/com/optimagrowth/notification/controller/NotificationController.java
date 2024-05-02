@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.optimagrowth.notification.model.NotificationSubscription;
+import com.optimagrowth.notification.model.PushSubscription;
 import com.optimagrowth.notification.service.NotificationService;
 
 import jakarta.validation.Valid;
@@ -23,7 +23,7 @@ class NotificationController {
     }
 
     @PostMapping("/subscribe")
-    ResponseEntity<Void> subscribe(@Valid @NotNull @RequestBody NotificationSubscription subscription) {
+    ResponseEntity<Void> subscribe(@Valid @NotNull @RequestBody PushSubscription subscription) {
         notificationService.subscribe(subscription);
 
         return ResponseEntity.ok().build();

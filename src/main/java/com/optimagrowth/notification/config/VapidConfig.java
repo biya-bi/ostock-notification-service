@@ -3,11 +3,11 @@ package com.optimagrowth.notification.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import lombok.Getter;
+import lombok.Data;
 
 @Configuration
 @ConfigurationProperties(prefix = "notification.vapid")
-@Getter
+@Data
 public class VapidConfig {
 
     private String publicKey;

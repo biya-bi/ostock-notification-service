@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.optimagrowth.notification.config.VapidConfig;
-import com.optimagrowth.notification.model.NotificationSubscription;
-import com.optimagrowth.notification.repository.NotificationSubscriptionRepository;
+import com.optimagrowth.notification.model.PushSubscription;
+import com.optimagrowth.notification.repository.PushSubscriptionRepository;
 import com.optimagrowth.notification.service.NotificationService;
 
 import nl.martijndwars.webpush.Notification;
@@ -16,16 +16,16 @@ import nl.martijndwars.webpush.PushService;
 @Service
 class NotificationServiceImpl implements NotificationService {
 
-    private final NotificationSubscriptionRepository subscriptionRepository;
+    private final PushSubscriptionRepository subscriptionRepository;
     private final VapidConfig vapidConfig;
 
-    NotificationServiceImpl(NotificationSubscriptionRepository subscriptionRepository, VapidConfig config) {
+    NotificationServiceImpl(PushSubscriptionRepository subscriptionRepository, VapidConfig config) {
         this.subscriptionRepository = subscriptionRepository;
         this.vapidConfig = config;
     }
 
     @Override
-    public NotificationSubscription subscribe(NotificationSubscription subscription) {
+    public PushSubscription subscribe(PushSubscription subscription) {
         subscription.setId(UUID.randomUUID().toString());
 
         return subscriptionRepository.save(subscription);
