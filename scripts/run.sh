@@ -18,5 +18,6 @@ fi
 export JWT_ISSUER_URI=`cat ${JWT_ISSUER_URI_FILE}`
 export VAPID_PRIVATE_KEY=`cat ${VAPID_PRIVATE_KEY_FILE}`
 export VAPID_PUBLIC_KEY=`cat ${VAPID_PUBLIC_KEY_FILE}`
+export VAPID_SUBJECT=`cat ${VAPID_SUBJECT_FILE}`
 
 java org.springframework.boot.loader.launch.JarLauncher
