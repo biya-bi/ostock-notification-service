@@ -1,10 +1,8 @@
 package com.optimagrowth.notification.service.impl;
 
-import java.security.Security;
 import java.util.UUID;
 
 import org.apache.http.HttpResponse;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.stereotype.Service;
 
 import com.optimagrowth.notification.exception.NotificationException;
@@ -15,7 +13,6 @@ import com.optimagrowth.notification.repository.PushSubscriptionRepository;
 import com.optimagrowth.notification.service.NotificationService;
 import com.optimagrowth.service.MessageService;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.NotFoundException;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
@@ -40,11 +37,6 @@ class NotificationServiceImpl implements NotificationService {
         this.eventRepository = eventRepository;
         this.pushService = pushService;
         this.messageService = messageService;
-    }
-
-    @PostConstruct
-    private void init() {
-        Security.addProvider(new BouncyCastleProvider());
     }
 
     @Override

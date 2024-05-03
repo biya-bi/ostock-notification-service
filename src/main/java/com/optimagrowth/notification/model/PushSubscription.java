@@ -1,9 +1,13 @@
 package com.optimagrowth.notification.model;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -13,7 +17,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "push_subscription")
-public class PushSubscription  {
+public class PushSubscription {
     @Id
     @Column(name = "id", nullable = false)
     private String id;
@@ -28,4 +32,6 @@ public class PushSubscription  {
     @Embedded
     private SubscriptionKeys keys;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "subscription")
+    private List<SubscriptionNotificationEvent> events;
 }

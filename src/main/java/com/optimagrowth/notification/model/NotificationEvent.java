@@ -1,8 +1,12 @@
 package com.optimagrowth.notification.model;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -27,5 +31,8 @@ public class NotificationEvent {
     @NotBlank
     @Column(nullable = false)
     private String payload;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "event")
+    private List<SubscriptionNotificationEvent> subscriptions;
 
 }
