@@ -15,8 +15,6 @@ import com.optimagrowth.notification.repository.PushSubscriptionRepository;
 import com.optimagrowth.notification.service.NotificationService;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import nl.martijndwars.webpush.Subscription;
@@ -50,6 +48,13 @@ class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public NotificationEvent register(NotificationEvent event) {
+        event.setId(UUID.randomUUID().toString());
+
+        return eventRepository.save(event);
+    }
+
+    @Override
     public HttpResponse send(PushSubscription subscription, String payload) {
         try {
             var notification = new Notification(convert(subscription), payload);
@@ -60,13 +65,6 @@ class NotificationServiceImpl implements NotificationService {
         } catch (Exception e) {
             throw new NotificationException(e);
         }
-    }
-
-    @Override
-    public NotificationEvent register(@Valid @NotNull NotificationEvent event) {
-        event.setId(UUID.randomUUID().toString());
-
-        return eventRepository.save(event);
     }
 
     private Subscription convert(PushSubscription subscription) {

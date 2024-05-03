@@ -5,13 +5,11 @@ import org.apache.http.HttpResponse;
 import com.optimagrowth.notification.model.NotificationEvent;
 import com.optimagrowth.notification.model.PushSubscription;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
 public interface NotificationService {
-    PushSubscription subscribe(@Valid @NotNull PushSubscription subscription);
+    PushSubscription subscribe(PushSubscription subscription);
+
+    NotificationEvent register(NotificationEvent event);
 
     HttpResponse send(PushSubscription subscription, String payload);
 
-    NotificationEvent register(@Valid @NotNull NotificationEvent event);
 }
