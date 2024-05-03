@@ -1,6 +1,7 @@
 package com.optimagrowth.notification.service.impl;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.http.HttpResponse;
 import org.springframework.stereotype.Service;
@@ -8,8 +9,10 @@ import org.springframework.stereotype.Service;
 import com.optimagrowth.notification.exception.NotificationException;
 import com.optimagrowth.notification.model.NotificationEvent;
 import com.optimagrowth.notification.model.PushSubscription;
+import com.optimagrowth.notification.model.SubscriptionNotificationEvent;
 import com.optimagrowth.notification.repository.NotificationEventRepository;
 import com.optimagrowth.notification.repository.PushSubscriptionRepository;
+import com.optimagrowth.notification.repository.SubscriptionNotificationEventRepository;
 import com.optimagrowth.notification.service.NotificationService;
 import com.optimagrowth.service.MessageService;
 
@@ -24,45 +27,62 @@ class NotificationServiceImpl implements NotificationService {
     private static final String RESOURCE_NOT_FOUND = "resource.not.found";
 
     private final PushSubscriptionRepository subscriptionRepository;
-    private final NotificationEventRepository eventRepository;
+    private final NotificationEventRepository notificationEventRepository;
+    private final SubscriptionNotificationEventRepository subscriptionNotificationEventRepository;
     private final PushService pushService;
     private final MessageService messageService;
 
     NotificationServiceImpl(
             PushSubscriptionRepository subscriptionRepository,
-            NotificationEventRepository eventRepository,
+            NotificationEventRepository notificationEventRepository,
+            SubscriptionNotificationEventRepository subscriptionNotificationEventRepository,
             PushService pushService,
             MessageService messageService) {
         this.subscriptionRepository = subscriptionRepository;
-        this.eventRepository = eventRepository;
+        this.notificationEventRepository = notificationEventRepository;
+        this.subscriptionNotificationEventRepository = subscriptionNotificationEventRepository;
         this.pushService = pushService;
         this.messageService = messageService;
     }
 
     @Override
     public PushSubscription subscribe(PushSubscription subscription) {
-        subscription.setId(UUID.randomUUID().toString());
+        subscription.setId(generateUuid());
 
         return subscriptionRepository.save(subscription);
     }
 
     @Override
     public NotificationEvent register(NotificationEvent event) {
-        event.setId(UUID.randomUUID().toString());
+        event.setId(generateUuid());
 
-        return eventRepository.save(event);
+        return notificationEventRepository.save(event);
     }
 
     @Override
-    public HttpResponse send(String eventType) {
-        var event = eventRepository.findByType(eventType);
+    public void send(String eventType) {
+        var notificationEvent = notificationEventRepository.findByType(eventType);
 
-        if (event == null) {
+        if (notificationEvent == null) {
             throw new NotFoundException(messageService.getMessage(RESOURCE_NOT_FOUND));
         }
 
-        // TODO Get all subscriptions for which this event has not been sent
-        throw new UnsupportedOperationException("Method not fully implemented 'send'");
+        var subscriptions = subscriptionNotificationEventRepository.findByEvent(notificationEvent.getId());
+
+        var notifiedSubscriptionIds = subscriptions.stream()
+                .map(SubscriptionNotificationEvent::getSubscription)
+                .map(PushSubscription::getId)
+                .collect(Collectors.toList());
+
+        subscriptionRepository.findExcept(notifiedSubscriptionIds).forEach(subscription -> {
+            send(subscription, notificationEvent.getPayload());
+            // At this point, the notification was sent successfully. So, mark it (by saving
+            // it) as done to avoid resending the same notification to the same user.
+
+            var subscriptionNotificationEvent = new SubscriptionNotificationEvent(generateUuid(), subscription,
+                    notificationEvent);
+            subscriptionNotificationEventRepository.save(subscriptionNotificationEvent);
+        });
     }
 
     @Override
@@ -86,6 +106,10 @@ class NotificationServiceImpl implements NotificationService {
         sub.endpoint = subscription.getEndpoint();
 
         return sub;
+    }
+
+    private String generateUuid() {
+        return UUID.randomUUID().toString();
     }
 
 }
