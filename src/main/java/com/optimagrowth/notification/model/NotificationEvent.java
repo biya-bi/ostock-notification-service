@@ -18,7 +18,7 @@ public class NotificationEvent {
     private String id;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String type;
 
     @Column(name = "occurred_at")

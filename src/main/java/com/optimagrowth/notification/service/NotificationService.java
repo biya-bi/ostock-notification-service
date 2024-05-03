@@ -10,6 +10,7 @@ public interface NotificationService {
 
     NotificationEvent register(NotificationEvent event);
 
-    HttpResponse send(PushSubscription subscription, String payload);
+    HttpResponse send(String eventType);
 
+    HttpResponse send(PushSubscription subscription, String payload);
 }

@@ -13,8 +13,10 @@ import com.optimagrowth.notification.model.PushSubscription;
 import com.optimagrowth.notification.repository.NotificationEventRepository;
 import com.optimagrowth.notification.repository.PushSubscriptionRepository;
 import com.optimagrowth.notification.service.NotificationService;
+import com.optimagrowth.service.MessageService;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.ws.rs.NotFoundException;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import nl.martijndwars.webpush.Subscription;
@@ -22,17 +24,22 @@ import nl.martijndwars.webpush.Subscription;
 @Service
 class NotificationServiceImpl implements NotificationService {
 
+    private static final String RESOURCE_NOT_FOUND = "resource.not.found";
+
     private final PushSubscriptionRepository subscriptionRepository;
     private final NotificationEventRepository eventRepository;
     private final PushService pushService;
+    private final MessageService messageService;
 
     NotificationServiceImpl(
             PushSubscriptionRepository subscriptionRepository,
+            NotificationEventRepository eventRepository,
             PushService pushService,
-            NotificationEventRepository eventRepository) {
+            MessageService messageService) {
         this.subscriptionRepository = subscriptionRepository;
-        this.pushService = pushService;
         this.eventRepository = eventRepository;
+        this.pushService = pushService;
+        this.messageService = messageService;
     }
 
     @PostConstruct
@@ -52,6 +59,18 @@ class NotificationServiceImpl implements NotificationService {
         event.setId(UUID.randomUUID().toString());
 
         return eventRepository.save(event);
+    }
+
+    @Override
+    public HttpResponse send(String eventType) {
+        var event = eventRepository.findByType(eventType);
+
+        if (event == null) {
+            throw new NotFoundException(messageService.getMessage(RESOURCE_NOT_FOUND));
+        }
+
+        // TODO Get all subscriptions for which this event has not been sent
+        throw new UnsupportedOperationException("Method not fully implemented 'send'");
     }
 
     @Override

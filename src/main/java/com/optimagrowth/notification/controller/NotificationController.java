@@ -1,6 +1,7 @@
 package com.optimagrowth.notification.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,13 @@ class NotificationController {
         var newEvent = notificationService.register(event);
 
         return ResponseEntity.ok(newEvent);
+    }
+
+    @PostMapping("/send/{eventType}")
+    ResponseEntity<Void> send(@Valid @NotNull @PathVariable("eventType") String eventType) {
+        notificationService.send(eventType);
+
+        return ResponseEntity.ok().build();
     }
 
 }

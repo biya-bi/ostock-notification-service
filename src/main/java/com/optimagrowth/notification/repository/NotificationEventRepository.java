@@ -10,4 +10,5 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 @Repository
 @CircuitBreaker(name = "notificationEventRepository")
 public interface NotificationEventRepository extends CrudRepository<NotificationEvent, String> {
+    NotificationEvent findByType(String type);
 }
