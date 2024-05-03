@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.optimagrowth.notification.model.NotificationEvent;
 import com.optimagrowth.notification.model.PushSubscription;
 import com.optimagrowth.notification.service.NotificationService;
 
@@ -27,6 +28,13 @@ class NotificationController {
         notificationService.subscribe(subscription);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/register")
+    ResponseEntity<NotificationEvent> register(@Valid @NotNull @RequestBody NotificationEvent event) {
+        var newEvent = notificationService.register(event);
+
+        return ResponseEntity.ok(newEvent);
     }
 
 }

@@ -8,11 +8,15 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.stereotype.Service;
 
 import com.optimagrowth.notification.exception.NotificationException;
+import com.optimagrowth.notification.model.NotificationEvent;
 import com.optimagrowth.notification.model.PushSubscription;
+import com.optimagrowth.notification.repository.NotificationEventRepository;
 import com.optimagrowth.notification.repository.PushSubscriptionRepository;
 import com.optimagrowth.notification.service.NotificationService;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import nl.martijndwars.webpush.Subscription;
@@ -21,11 +25,16 @@ import nl.martijndwars.webpush.Subscription;
 class NotificationServiceImpl implements NotificationService {
 
     private final PushSubscriptionRepository subscriptionRepository;
+    private final NotificationEventRepository eventRepository;
     private final PushService pushService;
 
-    NotificationServiceImpl(PushSubscriptionRepository subscriptionRepository, PushService pushService) {
+    NotificationServiceImpl(
+            PushSubscriptionRepository subscriptionRepository,
+            PushService pushService,
+            NotificationEventRepository eventRepository) {
         this.subscriptionRepository = subscriptionRepository;
         this.pushService = pushService;
+        this.eventRepository = eventRepository;
     }
 
     @PostConstruct
@@ -51,6 +60,13 @@ class NotificationServiceImpl implements NotificationService {
         } catch (Exception e) {
             throw new NotificationException(e);
         }
+    }
+
+    @Override
+    public NotificationEvent register(@Valid @NotNull NotificationEvent event) {
+        event.setId(UUID.randomUUID().toString());
+
+        return eventRepository.save(event);
     }
 
     private Subscription convert(PushSubscription subscription) {
