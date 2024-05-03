@@ -8,7 +8,7 @@ import lombok.Data;
 @Configuration
 @ConfigurationProperties(prefix = "notification.vapid")
 @Data
-public class VapidConfig {
+class VapidConfig {
 
     private String publicKey;
     private String privateKey;

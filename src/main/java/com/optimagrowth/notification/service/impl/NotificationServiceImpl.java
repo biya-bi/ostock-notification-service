@@ -1,27 +1,36 @@
 package com.optimagrowth.notification.service.impl;
 
-import java.security.GeneralSecurityException;
+import java.security.Security;
 import java.util.UUID;
 
+import org.apache.http.HttpResponse;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.stereotype.Service;
 
-import com.optimagrowth.notification.config.VapidConfig;
+import com.optimagrowth.notification.exception.NotificationException;
 import com.optimagrowth.notification.model.PushSubscription;
 import com.optimagrowth.notification.repository.PushSubscriptionRepository;
 import com.optimagrowth.notification.service.NotificationService;
 
+import jakarta.annotation.PostConstruct;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
+import nl.martijndwars.webpush.Subscription;
 
 @Service
 class NotificationServiceImpl implements NotificationService {
 
     private final PushSubscriptionRepository subscriptionRepository;
-    private final VapidConfig vapidConfig;
+    private final PushService pushService;
 
-    NotificationServiceImpl(PushSubscriptionRepository subscriptionRepository, VapidConfig config) {
+    NotificationServiceImpl(PushSubscriptionRepository subscriptionRepository, PushService pushService) {
         this.subscriptionRepository = subscriptionRepository;
-        this.vapidConfig = config;
+        this.pushService = pushService;
+    }
+
+    @PostConstruct
+    private void init() {
+        Security.addProvider(new BouncyCastleProvider());
     }
 
     @Override
@@ -32,14 +41,26 @@ class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void send(Notification notification) throws GeneralSecurityException {
-        PushService pushService = new PushService(vapidConfig.getPublicKey(), vapidConfig.getPrivateKey(),
-                vapidConfig.getSubject());
-        // TODO: Get subscriptionJson from DB
-        // Subscription subscription = new Gson().fromJson("subscriptionJson",
-        // Subscription.class);
-        // Notification notification = new Notification(subscription, "payload");
-        // HttpResponse httpResponse = pushService.send(notification);
+    public HttpResponse send(PushSubscription subscription, String payload) {
+        try {
+            var notification = new Notification(convert(subscription), payload);
+            return pushService.send(notification);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new NotificationException(e);
+        } catch (Exception e) {
+            throw new NotificationException(e);
+        }
+    }
+
+    private Subscription convert(PushSubscription subscription) {
+        var keys = subscription.getKeys();
+
+        var sub = new Subscription();
+        sub.keys = sub.new Keys(keys.getP256dh(), keys.getAuth());
+        sub.endpoint = subscription.getEndpoint();
+
+        return sub;
     }
 
 }
